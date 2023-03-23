@@ -6,17 +6,17 @@ defmodule STemplateAPI.TemplatesTest do
   describe "templates" do
     alias STemplateAPI.Templates.Template
 
-    import STemplateAPI.TemplatesFixtures
+    import STemplateAPI.Test.Factories
 
     @invalid_attrs %{enabled: nil, labels: nil, name: nil, template: nil, type: nil}
 
     test "list_templates/0 returns all templates" do
-      template = template_fixture()
+      template = insert(:template)
       assert Templates.list_templates() == [template]
     end
 
     test "get_template!/1 returns the template with given id" do
-      template = template_fixture()
+      template = insert(:template)
       assert Templates.get_template!(template.id) == template
     end
 
@@ -42,7 +42,7 @@ defmodule STemplateAPI.TemplatesTest do
     end
 
     test "update_template/2 with valid data updates the template" do
-      template = template_fixture()
+      template = insert(:template)
 
       update_attrs = %{
         enabled: false,
@@ -61,19 +61,19 @@ defmodule STemplateAPI.TemplatesTest do
     end
 
     test "update_template/2 with invalid data returns error changeset" do
-      template = template_fixture()
+      template = insert(:template)
       assert {:error, %Ecto.Changeset{}} = Templates.update_template(template, @invalid_attrs)
       assert template == Templates.get_template!(template.id)
     end
 
     test "delete_template/1 deletes the template" do
-      template = template_fixture()
+      template = insert(:template)
       assert {:ok, %Template{}} = Templates.delete_template(template)
       assert_raise Ecto.NoResultsError, fn -> Templates.get_template!(template.id) end
     end
 
     test "change_template/1 returns a template changeset" do
-      template = template_fixture()
+      template = insert(:template)
       assert %Ecto.Changeset{} = Templates.change_template(template)
     end
   end

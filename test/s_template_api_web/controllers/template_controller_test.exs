@@ -1,7 +1,6 @@
 defmodule STemplateAPIWeb.TemplateControllerTest do
   use STemplateAPIWeb.ConnCase
 
-  # import STemplateAPI.TemplatesFixtures
   import STemplateAPI.Test.Factories
 
   alias STemplateAPI.Templates.Template
