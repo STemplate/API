@@ -25,7 +25,8 @@ defmodule STemplateAPIWeb.TemplateControllerTest do
 >>>>>>> bcf22ab (Test factory for templates and update controller test)
     labels: ["user", "signup"],
     name: "company1.user.signup",
-    template: "Welcome to the jungle {{user.name}}. You are now a member of {{company.name}}. Enjoy your stay with us!",
+    template:
+      "Welcome to the jungle {{user.name}}. You are now a member of {{company.name}}. Enjoy your stay with us!",
     type: "application/txt"
 <<<<<<< HEAD
   }
@@ -33,7 +34,8 @@ defmodule STemplateAPIWeb.TemplateControllerTest do
     enabled: true,
     labels: ["user", "signup"],
     name: "company1.user.signup",
-    template: "Welcome to the COMPANY {{user.name}}. You are now a member of {{company.name}}. Enjoy your stay with us!",
+    template:
+      "Welcome to the COMPANY {{user.name}}. You are now a member of {{company.name}}. Enjoy your stay with us!",
     type: "application/txt"
 =======
     labels: ["option1", "option2"],
@@ -68,9 +70,12 @@ defmodule STemplateAPIWeb.TemplateControllerTest do
     test "lists all templates", %{conn: conn} do
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> bcf22ab (Test factory for templates and update controller test)
 
+=======
+>>>>>>> a6c9ffc (Added render endpoint)
       %Template{id: id} = insert(:template)
       insert(:template)
 
@@ -102,6 +107,7 @@ defmodule STemplateAPIWeb.TemplateControllerTest do
       conn = get(conn, ~p"/api/templates/#{id}")
 
       assert %{
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -141,16 +147,37 @@ defmodule STemplateAPIWeb.TemplateControllerTest do
     end
 
 >>>>>>> 4efc0aa (Generated files)
+=======
+               "id" => id,
+               "enabled" => @create_attrs.enabled,
+               "labels" => @create_attrs.labels,
+               "name" => @create_attrs.name,
+               "template" => @create_attrs.template,
+               "type" => @create_attrs.type
+             } == json_response(conn, 200)["data"]
+    end
+
+    test "renders errors when data is invalid", %{conn: conn} do
+      conn = post(conn, ~p"/api/templates", template: @invalid_attrs)
+      assert json_response(conn, 422)["errors"] != %{}
+    end
+  end
+
+>>>>>>> a6c9ffc (Added render endpoint)
   describe "update template" do
     setup [:create_template]
 
-    test "renders template when data is valid", %{conn: conn, template: %Template{id: id} = template} do
+    test "renders template when data is valid", %{
+      conn: conn,
+      template: %Template{id: id} = template
+    } do
       conn = put(conn, ~p"/api/templates/#{template}", template: @update_attrs)
       assert %{"id" => ^id} = json_response(conn, 200)["data"]
 
       conn = get(conn, ~p"/api/templates/#{id}")
 
       assert %{
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
                "template" => "Welcome to the COMPANY {{user.name}}. You are now a member of {{company.name}}. Enjoy your stay with us!"
@@ -165,6 +192,10 @@ defmodule STemplateAPIWeb.TemplateControllerTest do
 =======
                "template" => "Welcome to the COMPANY {{user.name}}. You are now a member of {{company.name}}. Enjoy your stay with us!"
 >>>>>>> bcf22ab (Test factory for templates and update controller test)
+=======
+               "template" =>
+                 "Welcome to the COMPANY {{user.name}}. You are now a member of {{company.name}}. Enjoy your stay with us!"
+>>>>>>> a6c9ffc (Added render endpoint)
              } = json_response(conn, 200)["data"]
     end
 

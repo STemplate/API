@@ -38,6 +38,13 @@ defmodule STemplateAPI.Templates do
   def get_template!(id), do: Repo.get!(Template, id)
 
   @doc """
+  Gets a single template by name.
+  """
+  def get_template_by_name(name) do
+    Template |> Repo.get_by(name: name)
+  end
+
+  @doc """
   Creates a template.
 
   ## Examples

@@ -9,6 +9,7 @@ defmodule STemplateAPIWeb.Router do
     pipe_through :api
 
     resources "/templates", TemplateController, only: [:index, :create, :show, :update, :delete]
+    resources "/render", RenderController, only: [:create]
   end
 
   # Enable LiveDashboard in development
