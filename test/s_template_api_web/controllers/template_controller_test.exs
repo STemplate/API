@@ -3,12 +3,15 @@ defmodule STemplateAPIWeb.TemplateControllerTest do
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   import STemplateAPI.Test.Factories
 =======
   import STemplateAPI.TemplatesFixtures
 >>>>>>> 4efc0aa (Generated files)
 =======
   # import STemplateAPI.TemplatesFixtures
+=======
+>>>>>>> b6ee137 (Removed fixture)
   import STemplateAPI.Test.Factories
 >>>>>>> bcf22ab (Test factory for templates and update controller test)
 
