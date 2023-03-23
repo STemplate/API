@@ -1,18 +1,20 @@
 # STemplateAPI
 
-To start your Phoenix server:
+Simple ..., String ... , Super?
+Liquid strings templates by API.
 
-  * Run `mix setup` to install and setup dependencies
-  * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+## Model
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+```mermaid
+erDiagram
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+    template {
+        character_varying name
+        character_varying template
+        character_varying type
+        bool enabled
+        array labels
+    }
+```
 
-## Learn more
 
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
