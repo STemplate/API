@@ -17,6 +17,7 @@ erDiagram
     }
 ```
 
+<<<<<<< HEAD
 ## Examples
 
 <!-- TODO: add it -->
@@ -61,3 +62,6 @@ mix phx.routes | grep '/api' | awk '{print $2 " " $3}' | sed '/.*Controller/d'
 # seed some data
 mix run priv/repo/seeds.exs
 ```
+=======
+
+>>>>>>> 987819c (Generated files)
