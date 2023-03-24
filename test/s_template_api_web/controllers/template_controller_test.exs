@@ -9,14 +9,16 @@ defmodule STemplateAPIWeb.TemplateControllerTest do
     enabled: true,
     labels: ["user", "signup"],
     name: "company1.user.signup",
-    template: "Welcome to the jungle {{user.name}}. You are now a member of {{company.name}}. Enjoy your stay with us!",
+    template:
+      "Welcome to the jungle {{user.name}}. You are now a member of {{company.name}}. Enjoy your stay with us!",
     type: "application/txt"
   }
   @update_attrs %{
     enabled: true,
     labels: ["user", "signup"],
     name: "company1.user.signup",
-    template: "Welcome to the COMPANY {{user.name}}. You are now a member of {{company.name}}. Enjoy your stay with us!",
+    template:
+      "Welcome to the COMPANY {{user.name}}. You are now a member of {{company.name}}. Enjoy your stay with us!",
     type: "application/txt"
   }
   @invalid_attrs %{enabled: nil, labels: nil, name: nil, template: nil, type: nil}
@@ -27,7 +29,6 @@ defmodule STemplateAPIWeb.TemplateControllerTest do
 
   describe "index" do
     test "lists all templates", %{conn: conn} do
-
       %Template{id: id} = insert(:template)
       insert(:template)
 
@@ -47,32 +48,36 @@ defmodule STemplateAPIWeb.TemplateControllerTest do
       conn = get(conn, ~p"/api/templates/#{id}")
 
       assert %{
-        "id" => id,
-        "enabled" => @create_attrs.enabled,
-        "labels" => @create_attrs.labels,
-        "name" => @create_attrs.name,
-        "template" => @create_attrs.template,
-        "type" => @create_attrs.type
-        } == json_response(conn, 200)["data"]
-      end
-
-      test "renders errors when data is invalid", %{conn: conn} do
-        conn = post(conn, ~p"/api/templates", template: @invalid_attrs)
-        assert json_response(conn, 422)["errors"] != %{}
-      end
+               "id" => id,
+               "enabled" => @create_attrs.enabled,
+               "labels" => @create_attrs.labels,
+               "name" => @create_attrs.name,
+               "template" => @create_attrs.template,
+               "type" => @create_attrs.type
+             } == json_response(conn, 200)["data"]
     end
+
+    test "renders errors when data is invalid", %{conn: conn} do
+      conn = post(conn, ~p"/api/templates", template: @invalid_attrs)
+      assert json_response(conn, 422)["errors"] != %{}
+    end
+  end
 
   describe "update template" do
     setup [:create_template]
 
-    test "renders template when data is valid", %{conn: conn, template: %Template{id: id} = template} do
+    test "renders template when data is valid", %{
+      conn: conn,
+      template: %Template{id: id} = template
+    } do
       conn = put(conn, ~p"/api/templates/#{template}", template: @update_attrs)
       assert %{"id" => ^id} = json_response(conn, 200)["data"]
 
       conn = get(conn, ~p"/api/templates/#{id}")
 
       assert %{
-               "template" => "Welcome to the COMPANY {{user.name}}. You are now a member of {{company.name}}. Enjoy your stay with us!"
+               "template" =>
+                 "Welcome to the COMPANY {{user.name}}. You are now a member of {{company.name}}. Enjoy your stay with us!"
              } = json_response(conn, 200)["data"]
     end
 

@@ -11,7 +11,6 @@ defmodule STemplateAPI.MixProject do
       aliases: aliases(),
       deps: deps(),
       test_coverage: [tool: ExCoveralls],
-
       preferred_cli_env: [
         coveralls: :test,
         "coveralls.detail": :test,
@@ -53,6 +52,8 @@ defmodule STemplateAPI.MixProject do
 
       # An HTTP client focused on performance.
       {:finch, "~> 0.13"},
+      # A library for parsing and rendering Liquid templates.
+      {:solid, "~> 0.14"},
 
       # Mix tasks to simplify use of Dialyzer in Elixir projects.
       {:dialyxir, "~> 1.0", only: :dev, runtime: false},
