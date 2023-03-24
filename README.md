@@ -17,10 +17,6 @@ erDiagram
     }
 ```
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> bcf22ab (Test factory for templates and update controller test)
 ## Examples
 
 <!-- TODO: add it -->
@@ -65,9 +61,3 @@ mix phx.routes | grep '/api' | awk '{print $2 " " $3}' | sed '/.*Controller/d'
 # seed some data
 mix run priv/repo/seeds.exs
 ```
-<<<<<<< HEAD
-=======
-
->>>>>>> 987819c (Generated files)
-=======
->>>>>>> bcf22ab (Test factory for templates and update controller test)
