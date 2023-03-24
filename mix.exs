@@ -11,6 +11,7 @@ defmodule STemplateAPI.MixProject do
       aliases: aliases(),
       deps: deps(),
       test_coverage: [tool: ExCoveralls],
+
       preferred_cli_env: [
         coveralls: :test,
         "coveralls.detail": :test,

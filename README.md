@@ -1,18 +1,63 @@
 # STemplateAPI
 
-To start your Phoenix server:
+Simple ..., String ... , Super?
+Liquid strings templates by API.
 
-  * Run `mix setup` to install and setup dependencies
-  * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+## Model
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+```mermaid
+erDiagram
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+    template {
+        character_varying name
+        character_varying template
+        character_varying type
+        bool enabled
+        array labels
+    }
+```
 
-## Learn more
+## Examples
 
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+<!-- TODO: add it -->
+```txt
+That's my secret {{ hero.name }}: I'm always angry.
+```
+
+```json
+{
+  "hero": {
+    "name": "Captain"
+  }
+}
+```
+
+## Cleaning code
+
+```shell
+direnv allow
+mix setup
+mix deps.update --all
+mix test
+
+mix format # format code
+mix credo # like rubocop
+mix coveralls.html # code coverage
+mix deps.audit # libraries vulnerabilities check
+mix sobelow # security static code check
+mix dialyzer # static analysis tool for Erlang
+mix docs # gen doc
+
+mix phx.server
+open http://localhost:4000/api/templates
+```
+
+## Routes
+
+```shell
+# simplified routes
+mix phx.routes | grep '/api' | awk '{print $2 " " $3}' | sed '/.*Controller/d'
+
+# seed some data
+mix run priv/repo/seeds.exs
+```
