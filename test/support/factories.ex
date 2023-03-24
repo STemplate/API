@@ -5,13 +5,22 @@ defmodule STemplateAPI.Test.Factories do
 
   use ExMachina.Ecto, repo: STemplateAPI.Repo
 
+  alias STemplateAPI.Templates.{Template, Version}
+
   def template_factory do
-    %STemplateAPI.Templates.Template{
+    %Template{
       enabled: true,
       labels: ["hardcoded", Faker.Lorem.word()],
       name: Faker.Food.dish() |> sequence,
       template: Faker.Lorem.sentence(),
       type: "application/txt"
+    }
+  end
+
+  def version_factory do
+    %Version{
+      content: Faker.Lorem.sentence(),
+      template: build(:template)
     }
   end
 end

@@ -94,9 +94,8 @@ defmodule STemplateAPIWeb.TemplateControllerTest do
       conn = delete(conn, ~p"/api/templates/#{template}")
       assert response(conn, 204)
 
-      assert_error_sent 404, fn ->
-        get(conn, ~p"/api/templates/#{template}")
-      end
+      conn = get(conn, ~p"/api/templates/#{template}")
+      assert response(conn, 404)
     end
   end
 
