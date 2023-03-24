@@ -28,8 +28,6 @@ defmodule STemplateAPI.Templates do
   @doc """
   Gets a single template.
 
-  Raises `Ecto.NoResultsError` if the Template does not exist.
-
   ## Examples
 
       iex> get_template(123)
@@ -144,8 +142,6 @@ defmodule STemplateAPI.Templates do
 
   @doc """
   Gets a single version.
-
-  Raises `Ecto.NoResultsError` if the Version does not exist.
 
   ## Examples
 
