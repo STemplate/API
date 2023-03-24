@@ -13,9 +13,9 @@ defmodule STemplateAPI.Liquid.Render do
     {:ok, "Hello john"
   }
   """
-  @spec call(%Template{}, map) :: {:error, String.t()} | {:ok, String.t()}
+  @spec call(map, map) :: {:error, String.t()} | {:ok, String.t()}
   def call(nil, _), do: {:error, "Template not found"}
-  def call(template, params), do: template |> render(params)
+  def call(%Template{} = template, params), do: template |> render(params)
 
   defp render(template, params) do
     case Solid.parse(template.template) do
