@@ -21,22 +21,21 @@ defmodule STemplateAPIWeb.TemplateController do
   end
 
   def show(conn, %{"id" => id}) do
-    template = Templates.get_template!(id)
-    render(conn, :show, template: template)
+    with {:ok, %Template{} = template} <- Templates.get_template(id) do
+      render(conn, :show, template: template)
+    end
   end
 
   def update(conn, %{"id" => id, "template" => template_params}) do
-    template = Templates.get_template!(id)
-
-    with {:ok, %Template{} = template} <- Templates.update_template(template, template_params) do
+    with {:ok, template} <- Templates.get_template(id),
+         {:ok, %Template{} = template} <- Templates.update_template(template, template_params) do
       render(conn, :show, template: template)
     end
   end
 
   def delete(conn, %{"id" => id}) do
-    template = Templates.get_template!(id)
-
-    with {:ok, %Template{}} <- Templates.delete_template(template) do
+    with {:ok, template} <- Templates.get_template(id),
+         {:ok, %Template{}} <- Templates.delete_template(template) do
       send_resp(conn, :no_content, "")
     end
   end

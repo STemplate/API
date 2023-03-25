@@ -6,6 +6,8 @@ defmodule STemplateAPI.Templates.Template do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias STemplateAPI.Templates.Version
+
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "templates" do
@@ -14,6 +16,8 @@ defmodule STemplateAPI.Templates.Template do
     field :name, :string
     field :template, :string
     field :type, :string
+
+    has_many :versions, Version
 
     timestamps()
   end

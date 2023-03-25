@@ -8,7 +8,12 @@ defmodule STemplateAPIWeb.Router do
   scope "/api", STemplateAPIWeb do
     pipe_through :api
 
-    resources "/templates", TemplateController, only: [:index, :create, :show, :update, :delete]
+    resources "/templates", TemplateController, only: [:index, :create, :show, :update, :delete] do
+      resources "/versions", VersionController, only: [:index]
+    end
+
+    resources "/versions", VersionController, only: [:show, :delete]
+
     resources "/render", RenderController, only: [:create]
   end
 

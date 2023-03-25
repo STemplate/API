@@ -4,9 +4,13 @@ defmodule STemplateAPI.Templates do
   """
 
   import Ecto.Query, warn: false
-  alias STemplateAPI.Repo
 
-  alias STemplateAPI.Templates.Template
+  alias STemplateAPI.Repo
+  alias STemplateAPI.Templates.{Template, Version}
+
+  ###########################################################################
+  # Templates
+  ###########################################################################
 
   @doc """
   Returns the list of templates.
@@ -24,18 +28,21 @@ defmodule STemplateAPI.Templates do
   @doc """
   Gets a single template.
 
-  Raises `Ecto.NoResultsError` if the Template does not exist.
-
   ## Examples
 
-      iex> get_template!(123)
-      %Template{}
+      iex> get_template(123)
+      {:ok, %Template{}}
 
-      iex> get_template!(456)
-      ** (Ecto.NoResultsError)
+      iex> get_template(456)
+      {:error, :not_found}
 
   """
-  def get_template!(id), do: Repo.get!(Template, id)
+  def get_template(id) do
+    case Repo.get(Template, id) do
+      nil -> {:error, :not_found}
+      result -> {:ok, result}
+    end
+  end
 
   @doc """
   Gets a single template by name.
@@ -74,7 +81,27 @@ defmodule STemplateAPI.Templates do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_template(%Template{} = template, attrs) do
+  def update_template(%Template{} = template, attrs), do: do_update_template(template, attrs)
+
+  # template content was modified. Let's create a new version
+  defp do_update_template(template, %{template: content} = attrs)
+       when template.template != content do
+    version_changeset =
+      %Version{} |> Version.changeset(%{content: template.template, template_id: template.id})
+
+    r =
+      Ecto.Multi.new()
+      |> Ecto.Multi.insert(:version, version_changeset)
+      |> Ecto.Multi.update(:template, template |> Template.changeset(attrs))
+      |> Repo.transaction()
+
+    case r do
+      {:ok, %{template: template}} -> {:ok, template}
+      {:error, _, error, _} -> {:error, error}
+    end
+  end
+
+  defp do_update_template(template, attrs) do
     template
     |> Template.changeset(attrs)
     |> Repo.update()
@@ -108,4 +135,56 @@ defmodule STemplateAPI.Templates do
   def change_template(%Template{} = template, attrs \\ %{}) do
     Template.changeset(template, attrs)
   end
+
+  ###########################################################################
+  # Versions
+  ###########################################################################
+
+  @doc """
+  Gets a single version.
+
+  ## Examples
+
+      iex> get_version(123)
+      {:ok, %Version{}}
+
+      iex> get_version(456)
+      {:error, :not_found}
+
+  """
+  def get_version(id) do
+    case Repo.get(Version, id) do
+      nil -> {:error, :not_found}
+      result -> {:ok, result}
+    end
+  end
+
+  @doc """
+  Deletes a version.
+
+  ## Examples
+
+      iex> delete_version(version)
+      {:ok, %Version{}}
+
+      iex> delete_version(version)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_version(%Version{} = version) do
+    Repo.delete(version)
+  end
+
+  # @doc """
+  # Returns an `%Ecto.Changeset{}` for tracking version changes.
+
+  # ## Examples
+
+  #     iex> change_version(version)
+  #     %Ecto.Changeset{data: %Version{}}
+
+  # """
+  # def change_version(%Version{} = version, attrs \\ %{}) do
+  #   Version.changeset(version, attrs)
+  # end
 end
