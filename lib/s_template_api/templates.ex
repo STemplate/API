@@ -84,7 +84,7 @@ defmodule STemplateAPI.Templates do
   def update_template(%Template{} = template, attrs), do: do_update_template(template, attrs)
 
   # template content was modified. Let's create a new version
-  defp do_update_template(template, %{template: content} = attrs)
+  defp do_update_template(template, %{"template" => content} = attrs)
        when template.template != content do
     version_changeset =
       %Version{} |> Version.changeset(%{content: template.template, template_id: template.id})

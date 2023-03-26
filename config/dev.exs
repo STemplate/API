@@ -23,7 +23,7 @@ config :s_template_api, STemplateAPIWeb.Endpoint,
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
-  secret_key_base: "xSXbFdkmOhdHITFQWqFo4Pfiggxz3TsD/olLwDYIliv9subQ9OD5GftmP+oQc/y2",
+  secret_key_base: System.get_env("SECRET_KEY_BASE"),
   watchers: []
 
 # ## SSL Support

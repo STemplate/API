@@ -23,4 +23,17 @@ defmodule STemplateAPI.Test.Factories do
       template: build(:template)
     }
   end
+
+  def organization_factory do
+    %STemplateAPI.Management.Organization{
+      enabled: true,
+      external_id: Faker.Lorem.word(),
+      name: Faker.Lorem.word(),
+      properties: %{
+        "bar" => %{
+          "foo" => Faker.Lorem.word()
+        }
+      }
+    }
+  end
 end
