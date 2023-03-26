@@ -16,14 +16,14 @@ defmodule STemplateAPIWeb.VersionControllerTest do
       conn = get(conn, ~p"/api/templates/#{template_id}/versions")
       assert json_response(conn, 200)["data"] == []
 
-      insert(:version, template: template, content: "bar")
-      insert(:version, template: template, content: "foo")
+      a_version = insert(:version, template: template, content: "bar")
+      b_version = insert(:version, template: template, content: "foo")
 
       conn = get(conn, ~p"/api/templates/#{template_id}/versions")
-      [%{"content" => a} | [%{"content" => b}]] = json_response(conn, 200)["data"]
+      [%{"inserted_at" => a} | [%{"inserted_at" => b}]] = json_response(conn, 200)["data"]
 
-      assert a == "bar"
-      assert b == "foo"
+      assert a_version.inserted_at |> NaiveDateTime.to_iso8601() == a
+      assert b_version.inserted_at |> NaiveDateTime.to_iso8601() == b
     end
 
     test "invalid template", %{conn: conn} do
