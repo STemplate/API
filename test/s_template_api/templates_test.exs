@@ -94,7 +94,7 @@ defmodule STemplateAPI.TemplatesTest do
 
     test "update_template/2 with valid data create a version with the previous" do
       template = insert(:template, template: "some template")
-      update_attrs = %{template: "some updated template"}
+      update_attrs = %{"template" => "some updated template"}
       assert {:ok, %Template{} = template} = Templates.update_template(template, update_attrs)
       assert template.template == "some updated template"
 
