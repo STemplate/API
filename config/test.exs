@@ -17,7 +17,7 @@ config :s_template_api, STemplateAPI.Repo,
 # you can enable the server option below.
 config :s_template_api, STemplateAPIWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
-  secret_key_base: System.get_env("SECRET_KEY_BASE"),
+  secret_key_base: "SECRET_KEY_BASE",
   server: false
 
 # Print only warnings and errors during test
