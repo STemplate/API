@@ -1,4 +1,4 @@
-defmodule STemplateApiWeb.RenderControllerTest do
+defmodule STemplateAPIWeb.RenderControllerTest do
   use STemplateAPIWeb.ConnCase
 
   import STemplateAPI.Test.Factories

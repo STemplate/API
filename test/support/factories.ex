@@ -33,7 +33,8 @@ defmodule STemplateAPI.Test.Factories do
         "bar" => %{
           "foo" => Faker.Lorem.word()
         }
-      }
+      },
+      api_key: Faker.Lorem.word()
     }
   end
 end

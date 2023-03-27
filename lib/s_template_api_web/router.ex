@@ -5,8 +5,24 @@ defmodule STemplateAPIWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :auth do
+    plug STemplateAPIWeb.Auth.Pipeline
+  end
+
+  # Unauthenticated routes
   scope "/api", STemplateAPIWeb do
-    pipe_through :api
+    pipe_through [:api]
+
+    resources "/auth", AuthController, only: [:create] do
+      resources "/refresh", AuthController, only: [:create]
+    end
+
+    resources "/organizations", OrganizationController, only: [:create]
+  end
+
+  # Authenticated routes
+  scope "/api", STemplateAPIWeb do
+    pipe_through [:api, :auth]
 
     resources "/organizations", OrganizationController,
       only: [:index, :create, :show, :update, :delete]

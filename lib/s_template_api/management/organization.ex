@@ -8,6 +8,7 @@ defmodule STemplateAPI.Management.Organization do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Ecto.Changeset
   alias Encryption.Hashing
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -27,15 +28,14 @@ defmodule STemplateAPI.Management.Organization do
   @doc false
   def changeset(organization, attrs) do
     organization
-    |> cast(attrs, [:name, :enabled, :properties, :api_key, :external_id])
+    |> cast(attrs, [:name, :enabled, :properties, :api_key, :external_id, :parent_organization_id])
     |> validate_required([:name, :enabled, :properties])
     |> hash_api_key()
     |> unique_constraint(:api_key_hash)
   end
 
-  defp hash_api_key(changeset) do
-    if Map.has_key?(changeset.changes, :api_key),
-      do: changeset |> put_change(:api_key_hash, Hashing.hash(changeset.changes.api_key)),
-      else: changeset
-  end
+  defp hash_api_key(%Changeset{valid?: true, changes: %{api_key: api_key}} = changeset),
+    do: changeset |> put_change(:api_key_hash, Hashing.hash(api_key))
+
+  defp hash_api_key(changeset), do: changeset
 end
