@@ -10,7 +10,8 @@ defmodule STemplateAPIWeb.OrganizationControllerTest do
     enabled: true,
     external_id: "some external_id",
     name: "some name",
-    properties: %{}
+    properties: %{},
+    api_key: "abc123"
   }
   @update_attrs %{
     enabled: false,

@@ -25,7 +25,9 @@ defmodule STemplateAPIWeb.TemplateControllerTest do
   @invalid_attrs %{enabled: nil, labels: nil, name: nil, template: nil, type: nil}
 
   setup %{conn: conn} do
-    {:ok, conn: conn |> AuthHelper.with_valid_authorization_header()}
+    {:ok,
+     conn: conn |> AuthHelper.with_valid_authorization_header(),
+     organization: insert(:organization)}
   end
 
   describe "index" do
@@ -42,8 +44,12 @@ defmodule STemplateAPIWeb.TemplateControllerTest do
   end
 
   describe "create template" do
-    test "renders template when data is valid", %{conn: conn} do
-      conn = post(conn, ~p"/api/templates", template: @create_attrs)
+    test "renders template when data is valid", %{conn: conn, organization: organization} do
+      conn =
+        post(conn, ~p"/api/templates",
+          template: @create_attrs |> Map.put(:organization_id, organization.id)
+        )
+
       assert %{"id" => id} = json_response(conn, 201)["data"]
 
       conn = get(conn, ~p"/api/templates/#{id}")

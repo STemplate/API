@@ -12,21 +12,28 @@ defmodule STemplateAPI.TemplatesTest do
 
     test "list_templates/0 returns all templates" do
       template = insert(:template)
-      assert Templates.list_templates() == [template]
+
+      [t] = Templates.list_templates()
+      assert %{t | organization: nil} == %{template | organization: nil}
     end
 
     test "get_template/1 returns the template with given id" do
       template = insert(:template)
-      assert Templates.get_template(template.id) == {:ok, template}
+      {:ok, t} = Templates.get_template(template.id)
+
+      assert %{t | organization: nil} == %{template | organization: nil}
     end
 
     test "create_template/1 with valid data creates a template" do
+      organization = insert(:organization)
+
       valid_attrs = %{
         enabled: true,
         labels: ["option1", "option2"],
         name: "some name",
         template: "some template",
-        type: "some type"
+        type: "some type",
+        organization_id: organization.id
       }
 
       assert {:ok, %Template{} = template} = Templates.create_template(valid_attrs)
@@ -63,7 +70,9 @@ defmodule STemplateAPI.TemplatesTest do
     test "update_template/2 with invalid data returns error changeset" do
       template = insert(:template)
       assert {:error, %Ecto.Changeset{}} = Templates.update_template(template, @invalid_attrs)
-      assert {:ok, template} == Templates.get_template(template.id)
+      {:ok, t} = Templates.get_template(template.id)
+
+      assert %{t | organization: nil} == %{template | organization: nil}
     end
 
     test "delete_template/1 deletes the template" do

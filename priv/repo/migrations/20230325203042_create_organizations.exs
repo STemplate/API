@@ -8,7 +8,7 @@ defmodule STemplateAPI.Repo.Migrations.CreateOrganizations do
       add :external_id, :string
       add :enabled, :boolean, default: false, null: false
       add :properties, :map, null: false, default: %{}
-      add :api_key_hash, :binary
+      add :api_key_hash, :binary, null: false
 
       add :parent_organization_id,
           references(:organizations, on_delete: :nilify_all, type: :binary_id)

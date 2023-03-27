@@ -13,7 +13,8 @@ defmodule STemplateAPI.Test.Factories do
       labels: ["hardcoded", Faker.Lorem.word()],
       name: Faker.Food.dish() |> sequence,
       template: Faker.Lorem.sentence(),
-      type: "application/txt"
+      type: "application/txt",
+      organization: build(:organization)
     }
   end
 
@@ -34,7 +35,8 @@ defmodule STemplateAPI.Test.Factories do
           "foo" => Faker.Lorem.word()
         }
       },
-      api_key: Faker.Lorem.word()
+      api_key: Faker.Lorem.word(),
+      api_key_hash: Faker.Lorem.word() |> Encryption.Hashing.hash()
     }
   end
 end
