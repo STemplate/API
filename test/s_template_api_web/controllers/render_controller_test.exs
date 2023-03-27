@@ -3,10 +3,15 @@ defmodule STemplateAPIWeb.RenderControllerTest do
 
   import STemplateAPI.Test.Factories
 
+  alias STemplateAPIWeb.Auth.AuthHelper
   alias STemplateAPI.Templates.Template
 
   setup %{conn: conn} do
-    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+    conn =
+      conn
+      |> AuthHelper.with_valid_authorization_header()
+
+    {:ok, conn: conn}
   end
 
   describe "render" do

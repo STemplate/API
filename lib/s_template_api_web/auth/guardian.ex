@@ -5,6 +5,7 @@ defmodule STemplateAPIWeb.Auth.Guardian do
   """
 
   use Guardian, otp_app: :s_template_api
+  alias STemplateAPI.Management.Organization
   alias STemplateAPI.Management
 
   @doc """
@@ -17,13 +18,13 @@ defmodule STemplateAPIWeb.Auth.Guardian do
     {:ok, [1, 2, 3]}
   """
   @spec subject_for_token(any, any) :: {:error, :no_organization_provided} | {:ok, binary}
-  def subject_for_token(nil, _), do: {:error, :no_organization_provided}
-
-  def subject_for_token(organization, _claims) do
+  def subject_for_token(%Organization{} = organization, _claims) do
     {:ok, descendants} = organization |> Management.get_descendant_organization_ids()
 
     {:ok, descendants}
   end
+
+  def subject_for_token(_, _), do: {:error, :no_organization_provided}
 
   @doc """
   In JWT this be found in the `sub` field.
@@ -32,7 +33,7 @@ defmodule STemplateAPIWeb.Auth.Guardian do
   @spec resource_from_claims(any) :: {:error, :no_sub_provided | :not_found} | {:ok, any}
   # def resource_from_claims(%{"sub" => sub}), do: sub |> Management.get_organization()
   def resource_from_claims(%{"sub" => sub}) do
-    sub |> Management.list_organizations()
+    [ids: sub] |> Management.list_organizations()
   end
 
   def resource_from_claims(_), do: {:error, :no_sub_provided}

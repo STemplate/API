@@ -34,19 +34,19 @@ defmodule STemplateAPIWeb.GuardianTest do
 
   describe "subject_for_token/2" do
     test "with valid id return id", %{created_organization: created_organization} do
-      assert {:ok, to_string(created_organization.id)} ==
+      assert {:ok, [created_organization.id]} ==
                Guardian.subject_for_token(created_organization, %{})
     end
 
     test "with invalid return error" do
-      assert {:error, :no_id_provided} = Guardian.subject_for_token(%{}, %{})
+      assert {:error, :no_organization_provided} = Guardian.subject_for_token(%{}, %{})
     end
   end
 
   describe "resource_from_claims/1" do
     test "with valid sub return organization", %{created_organization: created_organization} do
-      assert {:ok, %{created_organization | api_key: nil}} ==
-               Guardian.resource_from_claims(%{"sub" => to_string(created_organization.id)})
+      assert [%{created_organization | api_key: nil}] ==
+               Guardian.resource_from_claims(%{"sub" => [created_organization.id]})
     end
 
     test "with invalid return error" do

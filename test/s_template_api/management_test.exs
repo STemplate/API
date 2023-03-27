@@ -18,12 +18,16 @@ defmodule STemplateAPI.ManagementTest do
 
     test "list_organizations/0 returns all organizations" do
       organization = insert(:organization)
-      assert Management.list_organizations() == [organization]
+      assert Management.list_organizations() == [%{organization | api_key: nil}]
     end
 
     test "get_organization!/1 returns the organization with given id" do
       organization = insert(:organization)
-      assert Management.get_organization(organization.id) == {:ok, organization}
+
+      assert Management.get_organization(organization.id) == {
+               :ok,
+               %{organization | api_key: nil}
+             }
     end
 
     test "create_organization/1 with valid data creates a organization" do
@@ -74,7 +78,7 @@ defmodule STemplateAPI.ManagementTest do
       assert {:error, %Ecto.Changeset{}} =
                Management.update_organization(organization, @invalid_attrs)
 
-      assert {:ok, organization} == Management.get_organization(organization.id)
+      assert {:ok, %{organization | api_key: nil}} == Management.get_organization(organization.id)
     end
 
     test "delete_organization/1 deletes the organization" do

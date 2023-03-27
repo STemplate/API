@@ -19,10 +19,15 @@ defmodule STemplateAPI.Management do
 
   """
   def list_organizations(filters \\ []) do
-    ids = filters |> Keyword.get(:ids, [])
-    query = from o in Organization, where: o.id in ^ids
+    from(o in Organization)
+    |> filter_query(filters)
+    |> Repo.all()
+  end
 
-    query |> Repo.all()
+  defp filter_query(query, []), do: query
+
+  defp filter_query(query, ids: list) do
+    query |> where([o], o.id in ^list)
   end
 
   @doc """

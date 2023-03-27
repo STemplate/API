@@ -3,6 +3,7 @@ defmodule STemplateAPIWeb.TemplateControllerTest do
 
   import STemplateAPI.Test.Factories
 
+  alias STemplateAPIWeb.Auth.AuthHelper
   alias STemplateAPI.Templates.Template
 
   @create_attrs %{
@@ -24,7 +25,7 @@ defmodule STemplateAPIWeb.TemplateControllerTest do
   @invalid_attrs %{enabled: nil, labels: nil, name: nil, template: nil, type: nil}
 
   setup %{conn: conn} do
-    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+    {:ok, conn: conn |> AuthHelper.with_valid_authorization_header()}
   end
 
   describe "index" do

@@ -3,10 +3,11 @@ defmodule STemplateAPIWeb.VersionControllerTest do
 
   import STemplateAPI.Test.Factories
 
+  alias STemplateAPIWeb.Auth.AuthHelper
   alias STemplateAPI.Templates.{Template, Version}
 
   setup %{conn: conn} do
-    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+    {:ok, conn: conn |> AuthHelper.with_valid_authorization_header()}
   end
 
   describe "index" do

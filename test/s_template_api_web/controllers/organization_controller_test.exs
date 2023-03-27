@@ -3,6 +3,7 @@ defmodule STemplateAPIWeb.OrganizationControllerTest do
 
   import STemplateAPI.Test.Factories
 
+  alias STemplateAPIWeb.Auth.AuthHelper
   alias STemplateAPI.Management.Organization
 
   @create_attrs %{
@@ -20,7 +21,7 @@ defmodule STemplateAPIWeb.OrganizationControllerTest do
   @invalid_attrs %{api_key_hash: nil, enabled: nil, external_id: nil, name: nil, properties: nil}
 
   setup %{conn: conn} do
-    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+    {:ok, conn: conn |> AuthHelper.with_valid_authorization_header()}
   end
 
   describe "index" do
