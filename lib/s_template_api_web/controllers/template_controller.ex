@@ -8,9 +8,9 @@ defmodule STemplateAPIWeb.TemplateController do
   action_fallback STemplateAPIWeb.FallbackController
 
   def index(conn, _params) do
-    %{"sub" => allowed_organization_ids} =
+    allowed_organization_ids =
       conn
-      |> Guardian.Plug.current_claims()
+      |> Guardian.allowed_organization_ids()
 
     templates =
       [organization_ids: allowed_organization_ids]
@@ -39,7 +39,7 @@ defmodule STemplateAPIWeb.TemplateController do
     with {:ok, template} <- Templates.get_template(id),
          org_id = template_params |> Map.get("organization_id", template.organization_id),
          template <- Map.put(template, :organization_id, org_id),
-         {:ok, _} <- STemplateAPIWeb.Auth.Guardian.allowed?(conn, template),
+         {:ok, _} <- Guardian.allowed?(conn, template),
          {:ok, %Template{} = template} <- Templates.update_template(template, template_params) do
       render(conn, :show, template: template)
     end
@@ -47,7 +47,7 @@ defmodule STemplateAPIWeb.TemplateController do
 
   def delete(conn, %{"id" => id}) do
     with {:ok, template} <- Templates.get_template(id),
-         {:ok, _} <- STemplateAPIWeb.Auth.Guardian.allowed?(conn, template),
+         {:ok, _} <- Guardian.allowed?(conn, template),
          {:ok, %Template{}} <- Templates.delete_template(template) do
       send_resp(conn, :no_content, "")
     end

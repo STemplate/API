@@ -36,7 +36,8 @@ defmodule STemplateAPI.Test.Factories do
         }
       },
       api_key: Faker.Lorem.word(),
-      api_key_hash: Faker.Lorem.word() |> Encryption.Hashing.hash()
+      api_key_hash: Faker.Lorem.word() |> Encryption.Hashing.hash(),
+      parent_organization_id: nil
     }
   end
 end

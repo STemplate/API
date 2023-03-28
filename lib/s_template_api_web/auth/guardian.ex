@@ -52,6 +52,12 @@ defmodule STemplateAPIWeb.Auth.Guardian do
     end
   end
 
+  def allowed_organization_ids(conn) do
+    conn
+    |> Guardian.Plug.current_claims()
+    |> Map.get("sub")
+  end
+
   def allowed?(conn, to) do
     conn
     |> Guardian.Plug.current_claims()
