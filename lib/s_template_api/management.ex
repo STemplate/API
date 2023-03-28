@@ -4,6 +4,7 @@ defmodule STemplateAPI.Management do
   """
 
   import Ecto.Query, warn: false
+  alias Encryption.Hashing
   alias STemplateAPI.Repo
 
   alias STemplateAPI.Management.Organization
@@ -17,8 +18,16 @@ defmodule STemplateAPI.Management do
       [%Organization{}, ...]
 
   """
-  def list_organizations do
-    Repo.all(Organization)
+  def list_organizations(filters \\ []) do
+    from(o in Organization)
+    |> filter_query(filters)
+    |> Repo.all()
+  end
+
+  defp filter_query(query, []), do: query
+
+  defp filter_query(query, ids: list) do
+    query |> where([o], o.id in ^list)
   end
 
   @doc """
@@ -38,6 +47,35 @@ defmodule STemplateAPI.Management do
       nil -> {:error, :not_found}
       result -> {:ok, result}
     end
+  end
+
+  @doc """
+  Gets a single organization by api_key.
+
+  ## Examples
+
+    iex> Repo.get_organization_by_api_key("api_key")
+    {:ok, %Organization{}}
+
+  """
+  def get_organization_by_api_key(api_key) do
+    case Repo.get_by(Organization, api_key_hash: Hashing.hash(api_key)) do
+      nil -> {:error, :not_found}
+      result -> {:ok, result}
+    end
+  end
+
+  @doc """
+  Gets all the descendant organization ids of a given organization.
+  """
+  def get_descendant_organization_ids(organization) do
+    id = organization.id |> Ecto.UUID.dump!()
+
+    query =
+      from o in fragment("organization_descendants(?)", ^id),
+        select: o.id
+
+    {:ok, query |> Repo.all() |> Enum.map(&Ecto.UUID.load!/1)}
   end
 
   @doc """

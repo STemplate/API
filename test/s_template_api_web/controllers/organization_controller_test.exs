@@ -3,13 +3,15 @@ defmodule STemplateAPIWeb.OrganizationControllerTest do
 
   import STemplateAPI.Test.Factories
 
+  alias STemplateAPIWeb.Auth.AuthHelper
   alias STemplateAPI.Management.Organization
 
   @create_attrs %{
     enabled: true,
     external_id: "some external_id",
     name: "some name",
-    properties: %{}
+    properties: %{},
+    api_key: "abc123"
   }
   @update_attrs %{
     enabled: false,
@@ -20,13 +22,23 @@ defmodule STemplateAPIWeb.OrganizationControllerTest do
   @invalid_attrs %{api_key_hash: nil, enabled: nil, external_id: nil, name: nil, properties: nil}
 
   setup %{conn: conn} do
-    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+    organization = insert(:organization)
+    conn = conn |> AuthHelper.with_valid_authorization_header(organization.id)
+    {:ok, conn: conn, organization: organization}
   end
 
   describe "index" do
-    test "lists all organizations", %{conn: conn} do
+    test "lists all organizations", %{conn: conn, organization: organization} do
+      # One that belong to the organization
+      id = organization.id
+      # Another inner one, that belong
+      %{id: id2} = insert(:organization, parent_organization_id: organization.id)
+      conn = conn |> AuthHelper.with_valid_authorization_header(organization.id)
+      # Another that doesn't belong to the organization (should not be listed)
+      insert(:organization)
+
       conn = get(conn, ~p"/api/organizations")
-      assert json_response(conn, 200)["data"] == []
+      assert [%{"id" => ^id} | [%{"id" => ^id2}]] = json_response(conn, 200)["data"]
     end
   end
 
@@ -35,7 +47,11 @@ defmodule STemplateAPIWeb.OrganizationControllerTest do
       conn = post(conn, ~p"/api/organizations", organization: @create_attrs)
       assert %{"id" => id} = json_response(conn, 201)["data"]
 
-      conn = get(conn, ~p"/api/organizations/#{id}")
+      conn =
+        build_conn()
+        |> AuthHelper.with_valid_authorization_header(id)
+
+      conn = conn |> get(~p"/api/organizations/#{id}")
 
       assert %{
                "id" => ^id,
@@ -53,8 +69,6 @@ defmodule STemplateAPIWeb.OrganizationControllerTest do
   end
 
   describe "update organization" do
-    setup [:create_organization]
-
     test "renders organization when data is valid", %{
       conn: conn,
       organization: %Organization{id: id} = organization
@@ -73,6 +87,14 @@ defmodule STemplateAPIWeb.OrganizationControllerTest do
              } = json_response(conn, 200)["data"]
     end
 
+    test "renders error when organization is not allowed", %{
+      conn: conn
+    } do
+      organization = insert(:organization)
+      conn = put(conn, ~p"/api/organizations/#{organization}", organization: @update_attrs)
+      assert %{"errors" => %{"detail" => "Unauthorized"}} = json_response(conn, 401)
+    end
+
     test "renders errors when data is invalid", %{conn: conn, organization: organization} do
       conn = put(conn, ~p"/api/organizations/#{organization}", organization: @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
@@ -80,8 +102,6 @@ defmodule STemplateAPIWeb.OrganizationControllerTest do
   end
 
   describe "delete organization" do
-    setup [:create_organization]
-
     test "deletes chosen organization", %{conn: conn, organization: organization} do
       conn = delete(conn, ~p"/api/organizations/#{organization}")
       assert response(conn, 204)
@@ -89,10 +109,11 @@ defmodule STemplateAPIWeb.OrganizationControllerTest do
       conn = get(conn, ~p"/api/organizations/#{organization}")
       assert response(conn, 404)
     end
-  end
 
-  defp create_organization(_) do
-    organization = insert(:organization)
-    %{organization: organization}
+    test "render error on delete an unauthorized organization", %{conn: conn} do
+      organization = insert(:organization)
+      conn = delete(conn, ~p"/api/organizations/#{organization}")
+      assert %{"errors" => %{"detail" => "Unauthorized"}} = json_response(conn, 401)
+    end
   end
 end

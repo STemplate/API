@@ -11,9 +11,10 @@ defmodule STemplateAPI.Test.Factories do
     %Template{
       enabled: true,
       labels: ["hardcoded", Faker.Lorem.word()],
-      name: Faker.Food.dish() |> sequence,
+      name: Faker.Superhero.En.name() |> sequence,
       template: Faker.Lorem.sentence(),
-      type: "application/txt"
+      type: "application/txt",
+      organization: build(:organization)
     }
   end
 
@@ -28,12 +29,15 @@ defmodule STemplateAPI.Test.Factories do
     %STemplateAPI.Management.Organization{
       enabled: true,
       external_id: Faker.Lorem.word(),
-      name: Faker.Lorem.word(),
+      name: Faker.Company.En.name() |> sequence,
       properties: %{
         "bar" => %{
           "foo" => Faker.Lorem.word()
         }
-      }
+      },
+      api_key: Faker.Finance.Stock.ticker(),
+      api_key_hash: Faker.Finance.Stock.ticker() |> sequence |> Encryption.Hashing.hash(),
+      parent_organization_id: nil
     }
   end
 end

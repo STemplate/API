@@ -54,6 +54,9 @@ defmodule STemplateAPI.MixProject do
       {:finch, "~> 0.13"},
       # A library for parsing and rendering Liquid templates.
       {:solid, "~> 0.14"},
+      # Authentication
+      {:guardian, "~> 2.2"},
+      {:guardian_phoenix, "~> 2.0"},
 
       # Mix tasks to simplify use of Dialyzer in Elixir projects.
       {:dialyxir, "~> 1.0", only: :dev, runtime: false},

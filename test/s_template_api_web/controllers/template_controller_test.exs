@@ -1,8 +1,9 @@
 defmodule STemplateAPIWeb.TemplateControllerTest do
-  use STemplateAPIWeb.ConnCase
+  use STemplateAPIWeb.ConnCase, async: false
 
   import STemplateAPI.Test.Factories
 
+  alias STemplateAPIWeb.Auth.AuthHelper
   alias STemplateAPI.Templates.Template
 
   @create_attrs %{
@@ -24,25 +25,39 @@ defmodule STemplateAPIWeb.TemplateControllerTest do
   @invalid_attrs %{enabled: nil, labels: nil, name: nil, template: nil, type: nil}
 
   setup %{conn: conn} do
-    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+    organization = insert(:organization)
+    conn = conn |> AuthHelper.with_valid_authorization_header(organization.id)
+    {:ok, conn: conn, organization: organization}
   end
 
   describe "index" do
-    test "lists all templates", %{conn: conn} do
-      %Template{id: id} = insert(:template)
-      insert(:template)
+    test "lists all templates", %{conn: conn, organization: organization} do
+      # One that belong to the organization
+      %Template{id: id} = insert(:template, organization: organization)
 
+      # Another template that belongs to an inner organization
+      sub_organization = insert(:organization, parent_organization_id: organization.id)
+      %Template{id: id2} = insert(:template, organization: sub_organization)
+
+      # Another that doesn't belong to the organization (should not be listed)
+      insert(:template, organization: insert(:organization))
+
+      conn = conn |> AuthHelper.with_valid_authorization_header(organization.id)
       conn = get(conn, ~p"/api/templates")
       response = json_response(conn, 200)["data"]
 
       assert response |> length() == 2
-      assert [%{"id" => ^id} | _tail] = response
+      assert [%{"id" => ^id} | [%{"id" => ^id2}]] = response
     end
   end
 
   describe "create template" do
-    test "renders template when data is valid", %{conn: conn} do
-      conn = post(conn, ~p"/api/templates", template: @create_attrs)
+    test "renders template when data is valid", %{conn: conn, organization: organization} do
+      conn =
+        post(conn, ~p"/api/templates",
+          template: @create_attrs |> Map.put(:organization_id, organization.id)
+        )
+
       assert %{"id" => id} = json_response(conn, 201)["data"]
 
       conn = get(conn, ~p"/api/templates/#{id}")
@@ -81,6 +96,33 @@ defmodule STemplateAPIWeb.TemplateControllerTest do
              } = json_response(conn, 200)["data"]
     end
 
+    test "renders error when template doesn't belong to organization", %{
+      conn: conn
+    } do
+      another_org = insert(:organization)
+      template = insert(:template, organization: another_org)
+
+      conn = put(conn, ~p"/api/templates/#{template}", template: @update_attrs)
+
+      assert %{"errors" => %{"detail" => "Unauthorized"}} = json_response(conn, 401)
+    end
+
+    test "renders error when template try to change to a wrong organization", %{
+      conn: conn,
+      template: template
+    } do
+      another_org = insert(:organization)
+
+      conn =
+        put(
+          conn,
+          ~p"/api/templates/#{template}",
+          template: @update_attrs |> Map.put(:organization_id, another_org.id)
+        )
+
+      assert %{"errors" => %{"detail" => "Unauthorized"}} = json_response(conn, 401)
+    end
+
     test "renders errors when data is invalid", %{conn: conn, template: template} do
       conn = put(conn, ~p"/api/templates/#{template}", template: @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
@@ -97,10 +139,15 @@ defmodule STemplateAPIWeb.TemplateControllerTest do
       conn = get(conn, ~p"/api/templates/#{template}")
       assert response(conn, 404)
     end
+
+    test "render error when chosen template doesn't belong to organization", %{conn: conn} do
+      template = insert(:template, organization: insert(:organization))
+      conn = delete(conn, ~p"/api/templates/#{template}")
+      assert response(conn, 401)
+    end
   end
 
-  defp create_template(_) do
-    template = insert(:template)
-    %{template: template}
+  defp create_template(%{organization: organization}) do
+    %{template: insert(:template, organization: organization)}
   end
 end

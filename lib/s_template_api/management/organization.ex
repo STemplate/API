@@ -8,34 +8,43 @@ defmodule STemplateAPI.Management.Organization do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias STemplateAPI.Templates.Template
+  alias Ecto.Changeset
   alias Encryption.Hashing
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "organizations" do
-    field :enabled, :boolean, default: false
-    field :external_id, :string
     field :name, :string
+    field :enabled, :boolean, default: false
     field :properties, :map
+
+    field :external_id, :string
     field :parent_organization_id, :binary_id
     field :api_key, :binary, virtual: true
     field :api_key_hash, :binary
 
+    has_many :templates, Template
+
     timestamps()
   end
+
+  @optional ~w(api_key external_id parent_organization_id)a
+  @required ~w(name enabled properties)a
 
   @doc false
   def changeset(organization, attrs) do
     organization
-    |> cast(attrs, [:name, :enabled, :properties, :api_key, :external_id])
-    |> validate_required([:name, :enabled, :properties])
+    |> cast(attrs, @optional ++ @required)
+    |> validate_required(@required)
     |> hash_api_key()
-    |> unique_constraint(:api_key_hash)
+    |> unique_constraint(:api_key_hash, name: :organizations_api_key_hash_index)
+    |> unique_constraint(:name, name: :organizations_name_index)
+    |> foreign_key_constraint(:parent_organization_id)
   end
 
-  defp hash_api_key(changeset) do
-    if Map.has_key?(changeset.changes, :api_key),
-      do: changeset |> put_change(:api_key_hash, Hashing.hash(changeset.changes.api_key)),
-      else: changeset
-  end
+  defp hash_api_key(%Changeset{valid?: true, changes: %{api_key: api_key}} = changeset),
+    do: changeset |> put_change(:api_key_hash, Hashing.hash(api_key))
+
+  defp hash_api_key(changeset), do: changeset
 end
