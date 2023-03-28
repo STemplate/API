@@ -20,9 +20,20 @@ defmodule STemplateAPI.Templates do
       iex> list_templates()
       [%Template{}, ...]
 
+      iex> [organization_ids: ids] |>  list_templates()
+      [%Template{}, ...]
+
   """
-  def list_templates do
-    Repo.all(Template)
+  def list_templates(filters \\ []) do
+    from(o in Template)
+    |> filter_query(filters)
+    |> Repo.all()
+  end
+
+  defp filter_query(query, []), do: query
+
+  defp filter_query(query, organization_ids: list) do
+    query |> where([o], o.organization_id in ^list)
   end
 
   @doc """

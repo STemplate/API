@@ -28,7 +28,8 @@ defmodule STemplateAPIWeb.Auth.Pipeline do
     module: STemplateAPIWeb.Auth.Guardian,
     error_handler: STemplateAPIWeb.Auth.AuthErrorHandler
 
-  plug Guardian.Plug.VerifyHeader, claims: %{"typ" => "access"}
+  plug Guardian.Plug.VerifyHeader, scheme: "Bearer"
   plug Guardian.Plug.EnsureAuthenticated
-  plug Guardian.Plug.LoadResource, allow_blank: true
+  # Avoid load if it's not needed
+  # plug Guardian.Plug.LoadResource, allow_blank: true
 end

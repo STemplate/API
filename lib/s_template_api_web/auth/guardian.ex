@@ -5,8 +5,10 @@ defmodule STemplateAPIWeb.Auth.Guardian do
   """
 
   use Guardian, otp_app: :s_template_api
-  alias STemplateAPI.Management.Organization
+
   alias STemplateAPI.Management
+  alias STemplateAPI.Templates.Template
+  alias STemplateAPI.Management.Organization
 
   @doc """
   Subject of the Payload in the JWT.
@@ -31,7 +33,6 @@ defmodule STemplateAPIWeb.Auth.Guardian do
   Get the list of organization ids from the claims and return the organizations.
   """
   @spec resource_from_claims(any) :: {:error, :no_sub_provided | :not_found} | {:ok, any}
-  # def resource_from_claims(%{"sub" => sub}), do: sub |> Management.get_organization()
   def resource_from_claims(%{"sub" => sub}) do
     [ids: sub] |> Management.list_organizations()
   end
@@ -49,5 +50,23 @@ defmodule STemplateAPIWeb.Auth.Guardian do
     else
       _ -> {:error, :unauthorized}
     end
+  end
+
+  def allowed?(conn, to) do
+    conn
+    |> Guardian.Plug.current_claims()
+    |> do_check_access(to)
+  end
+
+  defp do_check_access(%{"sub" => allowed_organization_ids}, %Template{organization_id: org_id}),
+    do: access_result(allowed_organization_ids, org_id)
+
+  defp do_check_access(%{"sub" => allowed_organization_ids}, %Organization{id: org_id}),
+    do: access_result(allowed_organization_ids, org_id)
+
+  defp access_result(allowed_organization_ids, org_id) do
+    if allowed_organization_ids |> Enum.member?(org_id),
+      do: {:ok, org_id},
+      else: {:error, :unauthorized}
   end
 end
