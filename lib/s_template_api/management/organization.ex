@@ -38,8 +38,9 @@ defmodule STemplateAPI.Management.Organization do
     |> cast(attrs, @optional ++ @required)
     |> validate_required(@required)
     |> hash_api_key()
-    |> unique_constraint(:api_key_hash)
+    |> unique_constraint(:api_key_hash, name: :organizations_api_key_hash_index)
     |> unique_constraint(:name, name: :organizations_name_index)
+    |> foreign_key_constraint(:parent_organization_id)
   end
 
   defp hash_api_key(%Changeset{valid?: true, changes: %{api_key: api_key}} = changeset),
