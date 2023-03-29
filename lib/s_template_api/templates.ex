@@ -20,20 +20,32 @@ defmodule STemplateAPI.Templates do
       iex> list_templates()
       [%Template{}, ...]
 
-      iex> [organization_ids: ids] |>  list_templates()
+      iex>  %{organization_ids: [o.id], labels: ["opt1", "opt2"]} |> list_templates()
+      [%Template{}, ...]
+
+      iex>  %{labels: ["opt1", "opt2"]} |> list_templates()
+      [%Template{}, ...]
+
+      iex>  %{organization_ids: [o.id] } |> list_templates()
       [%Template{}, ...]
 
   """
-  def list_templates(filters \\ []) do
-    from(o in Template)
-    |> filter_query(filters)
+  def list_templates(filters \\ %{}) do
+    filters
+    |> Enum.reduce(Template, fn filter, query ->
+      query |> filter_query(filter)
+    end)
     |> Repo.all()
   end
 
-  defp filter_query(query, []), do: query
+  defp filter_query(query, %{}), do: query
 
-  defp filter_query(query, organization_ids: list) do
+  defp filter_query(query, {:organization_ids, list}) do
     query |> where([o], o.organization_id in ^list)
+  end
+
+  defp filter_query(query, {:labels, list}) do
+    from(t in query, where: fragment("? @> ?::VARCHAR[]", t.labels, ^list))
   end
 
   @doc """

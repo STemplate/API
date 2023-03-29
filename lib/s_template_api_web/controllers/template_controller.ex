@@ -7,13 +7,14 @@ defmodule STemplateAPIWeb.TemplateController do
 
   action_fallback STemplateAPIWeb.FallbackController
 
-  def index(conn, _params) do
-    allowed_organization_ids =
-      conn
-      |> Guardian.allowed_organization_ids()
-
+  # /templates
+  # /templates?labels=option1,option2
+  def index(conn, params) do
     templates =
-      [organization_ids: allowed_organization_ids]
+      %{
+        organization_ids: conn |> Guardian.allowed_organization_ids(),
+        labels: params |> Map.get("labels", "") |> String.split(",") |> Enum.reject(&(&1 == ""))
+      }
       |> Templates.list_templates()
 
     render(conn, :index, templates: templates)

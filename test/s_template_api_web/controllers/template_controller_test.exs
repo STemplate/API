@@ -1,5 +1,5 @@
 defmodule STemplateAPIWeb.TemplateControllerTest do
-  use STemplateAPIWeb.ConnCase, async: false
+  use STemplateAPIWeb.ConnCase
 
   import STemplateAPI.Test.Factories
 
@@ -33,7 +33,7 @@ defmodule STemplateAPIWeb.TemplateControllerTest do
   describe "index" do
     test "lists all templates", %{conn: conn, organization: organization} do
       # One that belong to the organization
-      %Template{id: id} = insert(:template, organization: organization)
+      %Template{id: id} = insert(:template, organization: organization, labels: ["bar", "foo"])
 
       # Another template that belongs to an inner organization
       sub_organization = insert(:organization, parent_organization_id: organization.id)
@@ -42,10 +42,24 @@ defmodule STemplateAPIWeb.TemplateControllerTest do
       # Another that doesn't belong to the organization (should not be listed)
       insert(:template, organization: insert(:organization))
 
+      # with labels
       conn = conn |> AuthHelper.with_valid_authorization_header(organization.id)
+      conn = get(conn, ~p"/api/templates?labels=bar,foo")
+      response = json_response(conn, 200)["data"]
+      assert response |> length() == 1
+      assert [%{"id" => ^id}] = response
+
+      # ignoring order
+      conn = build_conn() |> AuthHelper.with_valid_authorization_header(organization.id)
+      conn = get(conn, ~p"/api/templates?labels=foo,bar")
+      response = json_response(conn, 200)["data"]
+      assert response |> length() == 1
+      assert [%{"id" => ^id}] = response
+
+      # without labels
+      conn = build_conn() |> AuthHelper.with_valid_authorization_header(organization.id)
       conn = get(conn, ~p"/api/templates")
       response = json_response(conn, 200)["data"]
-
       assert response |> length() == 2
       assert [%{"id" => ^id} | [%{"id" => ^id2}]] = response
     end

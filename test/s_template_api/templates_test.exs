@@ -11,9 +11,38 @@ defmodule STemplateAPI.TemplatesTest do
     @invalid_attrs %{enabled: nil, labels: nil, name: nil, template: nil, type: nil}
 
     test "list_templates/0 returns all templates" do
-      template = insert(:template)
+      o = insert(:organization)
+      template = insert(:template, labels: ["opt1", "opt2"], organization: o)
+      insert(:template, labels: ["opt1", "opt3"], organization: o)
+      insert(:template, labels: ["opt1", "opt2"], organization: insert(:organization))
 
-      [t] = Templates.list_templates()
+      [t | _tail] = list = Templates.list_templates()
+      assert list |> length() == 3
+      assert %{t | organization: nil} == %{template | organization: nil}
+
+      [t | _tail] = list = %{organization_ids: [o.id]} |> Templates.list_templates()
+      assert list |> length() == 2
+      assert %{t | organization: nil} == %{template | organization: nil}
+
+      [t | _tail] =
+        list =
+        %{
+          organization_ids: [o.id],
+          labels: ["opt1", "opt2"]
+        }
+        |> Templates.list_templates()
+
+      assert list |> length() == 1
+      assert %{t | organization: nil} == %{template | organization: nil}
+
+      [t | _tail] =
+        list =
+        %{
+          labels: ["opt1", "opt2"]
+        }
+        |> Templates.list_templates()
+
+      assert list |> length() == 2
       assert %{t | organization: nil} == %{template | organization: nil}
     end
 

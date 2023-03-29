@@ -4,6 +4,7 @@ defmodule STemplateAPI.Templates.Template do
   """
 
   use Ecto.Schema
+
   import Ecto.Changeset
 
   alias STemplateAPI.Management.Organization
