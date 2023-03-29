@@ -31,6 +31,16 @@ defmodule STemplateAPI.Management do
   end
 
   @doc """
+  Returns the list of organization ids.
+  """
+  def organization_ids() do
+    Repo.all(Organization)
+
+    from(o in Organization, select: o.id, where: o.enabled)
+    |> Repo.all()
+  end
+
+  @doc """
   Gets a single organization.
 
   ## Examples

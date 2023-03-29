@@ -9,10 +9,6 @@ defmodule STemplateAPIWeb.RenderController do
 
   action_fallback STemplateAPIWeb.FallbackController
 
-  # def create(conn, bla) do
-  #   dbg
-  # end
-
   def create(conn, %{"name" => name, "params" => params}) do
     with template <- name |> STemplateAPI.Templates.get_template_by_name(),
          {:ok, result} <- template |> Render.call(params) do

@@ -25,7 +25,9 @@ defmodule STemplateAPIWeb.Router do
     pipe_through [:api, :auth]
 
     resources "/organizations", OrganizationController,
-      only: [:index, :create, :show, :update, :delete]
+      only: [:index, :create, :show, :update, :delete] do
+      resources "/labels", LabelController, only: [:index]
+    end
 
     resources "/templates", TemplateController, only: [:index, :create, :show, :update, :delete] do
       resources "/versions", VersionController, only: [:index]

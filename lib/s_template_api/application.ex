@@ -15,9 +15,10 @@ defmodule STemplateAPI.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: STemplateAPI.PubSub},
       # Start the Endpoint (http/https)
-      STemplateAPIWeb.Endpoint
+      STemplateAPIWeb.Endpoint,
       # Start a worker by calling: STemplateAPI.Worker.start_link(arg)
       # {STemplateAPI.Worker, arg}
+      Cache.LabelsCache
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

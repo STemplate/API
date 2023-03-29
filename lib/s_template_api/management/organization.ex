@@ -6,8 +6,12 @@ defmodule STemplateAPI.Management.Organization do
   to filter the data, and store common parameters to templates.
   """
   use Ecto.Schema
-  import Ecto.Changeset
 
+  import Ecto.Changeset
+  import Ecto.Query, warn: false
+
+  alias STemplateAPI.Repo
+  alias STemplateAPI.Management.Organization
   alias STemplateAPI.Templates.Template
   alias Ecto.Changeset
   alias Encryption.Hashing
@@ -41,6 +45,27 @@ defmodule STemplateAPI.Management.Organization do
     |> unique_constraint(:api_key_hash, name: :organizations_api_key_hash_index)
     |> unique_constraint(:name, name: :organizations_name_index)
     |> foreign_key_constraint(:parent_organization_id)
+  end
+
+  @doc """
+  Returns the list of unique organization labels.
+
+  Use cache to avoid multiple queries. `Cache.TagsCache`
+
+  ## Examples
+
+    iex> labels(%Organization{id: "ff822bfa-3de4-4166-995a-22dbf579a5ce"})
+    ["label1", "label2", ...]
+  """
+  def labels(%Organization{id: id}) do
+    query =
+      from t in Template,
+        join: o in assoc(t, :organization),
+        where: t.organization_id == ^id and o.enabled,
+        distinct: fragment("unnest(?)", t.labels),
+        select: fragment("unnest(?)", t.labels)
+
+    query |> Repo.all()
   end
 
   defp hash_api_key(%Changeset{valid?: true, changes: %{api_key: api_key}} = changeset),
